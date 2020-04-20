@@ -1,0 +1,8 @@
+*.ipynb
+*.db
+.DS_Store
+coenv/
+__pycache__/
+.ipynb_checkpoints/
+.flaskenv
+*.log
