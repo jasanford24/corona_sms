@@ -7,3 +7,4 @@ __pycache__/
 .flaskenv
 *.log
 test.py
+my_module.py

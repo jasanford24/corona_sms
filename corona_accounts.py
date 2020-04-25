@@ -14,32 +14,31 @@ class Account:
         self.county = county
 
     def set_data(self, data, prior):
-        current_data = data[(data['state'] == self.state)
-                            & (data['county'] == self.county)].reset_index(
-                                drop=True)
+        self.date = data['date'][0]
+        self.total_cases = sum(data['cases'])
+        self.total_deaths = sum(data['deaths'])
+        self.total_new_deaths = self.total_deaths - sum(prior['deaths'])
 
-        prior_data = prior[(prior['state'] == self.state)
-                           & (prior['county'] == self.county)].reset_index(
-                               drop=True)
-
-        self.total_cases = data['county_cases'][:-1].sum()
-        self.total_deaths = data['county_deaths'][:-1].sum()
-        self.total_new_deaths = self.total_deaths - \
-            prior['county_deaths'][:-1].sum()
-
-        self.state_case_count = current_data['state_cases'][0]
-        self.state_death_count = current_data['state_deaths'][0]
+        self.state_case_count = sum(data[data['state'] == self.state]['cases'])
+        self.state_death_count = sum(
+            data[data['state'] == self.state]['deaths'])
         self.state_new_deaths = self.state_death_count - \
-            prior_data['state_deaths'][0]
+            sum(prior[prior['state'] == self.state]['deaths'])
 
-        self.county_case_count = current_data['county_cases'][0]
-        self.county_death_count = current_data['county_deaths'][0]
+        self.county_case_count = sum(
+            data[(data['state'] == self.state) &
+                 (data['county'] == self.county)]['cases'])
+        self.county_death_count = sum(
+            data[(data['state'] == self.state) &
+                 (data['county'] == self.county)]['deaths'])
         self.county_new_deaths = self.county_death_count - \
-            prior_data['county_deaths'][0]
+            sum(prior[(prior['state'] == self.state) & (
+                prior['county'] == self.county)]['deaths'])
         self._build_message()
 
     def _build_message(self):
         message = 'US Covid-19'
+        message += f'\n{self.date}'
         message += f'\nCases: {self.total_cases:,}'
         message += f'\nDeaths: {self.total_deaths:,}'
 
@@ -53,12 +52,7 @@ class Account:
         if self.state_new_deaths:
             message += f' (+{self.state_new_deaths:,})'
 
-        # If New York, add City for clarity
-        if self.county == 'New York':
-            message += '\nNew York City'
-        else:
-            message += f'\n{self.county}'
-
+        message += f'\n{self.county}'
         message += f'\nCases: {self.county_case_count:,}'
         message += f'\nDeaths: {self.county_death_count:,}'
 
