@@ -7,4 +7,4 @@ sends out a text to a list of numbers.
 
 Requires Twilio account and additional files:
 
-<pre><code>corona-database.db    -   Database with cases and accounts tables.</code></pre>
+<pre><code>corona-database.db    -   Database with accounts tables.</code></pre>
