@@ -36,9 +36,9 @@ class Account:
         self.county_death_count = current_data['county_deaths'][0]
         self.county_new_deaths = self.county_death_count - \
             prior_data['county_deaths'][0]
-        self.build_message()
+        self._build_message()
 
-    def build_message(self):
+    def _build_message(self):
         message = 'US Covid-19'
         message += f'\nCases: {self.total_cases:,}'
         message += f'\nDeaths: {self.total_deaths:,}'
@@ -66,10 +66,15 @@ class Account:
             message += f' (+{self.county_new_deaths:,})'
         self.message = message
 
-    def send_sms(self):
-        twilioCli.messages.create(body=self.message,
-                                  from_=TWIL_NUMB,
-                                  to=self.number)
+    def send_sms(self, message=False):
+        if message:
+            twilioCli.messages.create(body=message,
+                                      from_=TWIL_NUMB,
+                                      to=self.number)
+        else:
+            twilioCli.messages.create(body=self.message,
+                                      from_=TWIL_NUMB,
+                                      to=self.number)
 
     def __repr__(self):
         return self.message + '\n'

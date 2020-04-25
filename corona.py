@@ -2,6 +2,7 @@
 US Covid-19 Statistic Webscraper
 """
 import logging
+import sys
 from time import localtime, sleep
 from datetime import date, timedelta
 
@@ -54,7 +55,7 @@ def to_sleep(seven=False):
             sleep(eight)
 
 
-def main_db_parse(main_data, test=False):
+def main_db_parse(main_data, test=True):
     logging.info('Starting database engine.')
     engine = create_engine('sqlite:///corona-database.db')
     with engine.connect() as connection:
@@ -80,10 +81,10 @@ def main_db_parse(main_data, test=False):
     engine.dispose()
     logging.info('Database engine closed.')
     if not test:
-        main()
+        main(test=False)
 
 
-def main(test=False):
+def main(test=True):
     if not test:
         to_sleep(seven=True)
 
@@ -92,8 +93,14 @@ def main(test=False):
     if not test:
         to_sleep(seven=False)
 
-    main_db_parse(main_data, test=True) if test else main_db_parse(main_data)
+    main_db_parse(main_data) if test else main_db_parse(main_data, test=False)
 
 
 if __name__ == '__main__':
-    main(test=True)
+    try:
+        if sys.argv[1].lower() == "run":
+            main(test=False)
+        else:
+            main()
+    except IndexError:
+        main()

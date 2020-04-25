@@ -4,10 +4,9 @@ from datetime import date
 from sys import platform
 
 import pandas as pd
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import NoSuchElementException
 
+from my_modules import Timer, create_driver
 from corona_accounts import emergency
 
 
@@ -56,15 +55,6 @@ def fix_county_div(driver):
             pass
     emergency(f'COUNTY_DIV changed to unknown.')
     raise WebsiteChanged('COUNTY_DIV changed.')
-
-
-def create_driver():
-    options = Options()
-    options.headless = True
-    options.add_argument('--incognito')
-    options.binary_location = BROWSER
-    driver_path = DRIVER
-    return webdriver.Chrome(options=options, executable_path=driver_path)
 
 
 def collect_main_data():
@@ -132,7 +122,7 @@ def collect_main_data():
 
         #  Loops through each state on the website and stores county data
         for x in range(COUNTY_DIV, len(state_data_df) + COUNTY_DIV):
-
+            print(x)
             # Clicks "Show More" button to show all county data
             drop_down = main_driver.find_element_by_xpath(
                 f'{MAIN_XPATH_ROOT}/div[{x}]/div/span[1]')
@@ -179,6 +169,7 @@ def collect_bay_area():
     """
     logging.info('collect_bay_area beginning.')
     with create_driver() as bay_area_driver:
+        bay_area_driver.implicitly_wait(10)
         bay_area_driver.get(BAY_URL)
 
         try:
@@ -209,6 +200,7 @@ def add_bay_area(main_data, bay_area):
     return temp_df
 
 
+@Timer(logger=logging.info)
 def collect_data(data_types):
     logging.info('Multiprocessing beginning.')
     with ProcessPoolExecutor() as executor:
